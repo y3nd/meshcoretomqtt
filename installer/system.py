@@ -431,7 +431,7 @@ def set_permissions(install_dir: str, config_dir: str, svc_user: str) -> None:
 # Docker helpers
 # ---------------------------------------------------------------------------
 
-GHCR_IMAGE = "ghcr.io/cisien/meshcoretomqtt:latest"
+GHCR_IMAGE = "ghcr.io/y3nd/meshcoretomqtt:latest"
 LOCAL_IMAGE = "mctomqtt:latest"
 
 

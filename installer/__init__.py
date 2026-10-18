@@ -34,7 +34,7 @@ def extract_version_from_file(path: str | Path) -> str:
 class InstallerContext:
     """Shared state passed between installer modules."""
 
-    repo: str = "Cisien/meshcoretomqtt"
+    repo: str = "y3nd/meshcoretomqtt"
     branch: str = "main"
     install_dir: str = "/opt/mctomqtt"
     config_dir: str = "/etc/mctomqtt"

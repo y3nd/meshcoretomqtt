@@ -7,7 +7,7 @@ This directory is for community-contributed configuration templates.
 Use the `--config` flag with the installer to apply a hosted configuration:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | \
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | \
   bash -s -- --config https://example.com/path/to/config.env
 ```
 
@@ -55,7 +55,7 @@ You can host your own configuration file anywhere (GitHub Gist, your repo, etc.)
 # Create a Gist with your config
 # Get the raw URL, then:
 
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | \
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | \
   bash -s -- --config https://gist.githubusercontent.com/username/abc123/raw/my-config.env
 ```
 
@@ -92,7 +92,7 @@ You can host configuration files anywhere publicly accessible:
 Store configs in your own repo and reference them:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | \
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | \
   bash -s -- --config https://raw.githubusercontent.com/yourusername/yourrepo/main/mctomqtt.env
 ```
 

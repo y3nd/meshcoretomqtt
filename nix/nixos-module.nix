@@ -118,7 +118,7 @@
       };
 
       update = {
-        repo = "Cisien/meshcoretomqtt";
+        repo = "y3nd/meshcoretomqtt";
         branch = "main";
       };
 

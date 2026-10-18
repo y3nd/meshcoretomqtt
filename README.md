@@ -30,7 +30,7 @@ logs include `hash=...`, while current repeater packet logs may not.
 ### One-Line Installation (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | sudo bash
 ```
 
 The installer will:
@@ -54,7 +54,7 @@ curl -fsSL https://raw.githubusercontent.com/yourusername/meshcoretomqtt/yourbra
 ### Local Testing
 
 ```bash
-git clone https://github.com/Cisien/meshcoretomqtt
+git clone https://github.com/y3nd/meshcoretomqtt
 cd meshcoretomqtt
 sudo LOCAL_INSTALL=$(pwd) ./install.sh
 ```
@@ -71,7 +71,7 @@ flake.nix
 
 ```nix
 inputs = {
-  meshcoretomqtt.url = "github:Cisien/meshcoretomqtt"
+  meshcoretomqtt.url = "github:y3nd/meshcoretomqtt"
 };
 ```
 
@@ -455,19 +455,19 @@ sudo -u mctomqtt ./venv/bin/python3 mctomqtt.py --config /etc/mctomqtt/config.to
 Use the standalone update script for the simplest update experience:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/scripts/update.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/scripts/update.sh | sudo bash
 ```
 
 Or re-run the installer — it will detect your existing installation and offer to update:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | sudo bash
 ```
 
 For non-interactive updates:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/install.sh | sudo bash -s -- --update
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/install.sh | sudo bash -s -- --update
 ```
 
 The updater will:
@@ -484,7 +484,7 @@ The updater will:
 If you have a legacy `~/.meshcoretomqtt` installation, migrate to the new layout:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/scripts/migrate.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/scripts/migrate.sh | sudo bash
 ```
 
 The migrator will:
@@ -496,7 +496,7 @@ The migrator will:
 ## Uninstallation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/uninstall.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/uninstall.sh | sudo bash
 ```
 
 The uninstaller will:

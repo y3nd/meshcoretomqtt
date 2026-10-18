@@ -44,7 +44,7 @@ class TestInstallFlow:
         result = subprocess.run(
             [
                 "python3", "-m", "installer", "install",
-                "--repo", "Cisien/meshcoretomqtt",
+                "--repo", "y3nd/meshcoretomqtt",
                 "--branch", "cisien/overhaul",
                 "--update",
             ],
@@ -63,7 +63,7 @@ class TestInstallFlow:
 
         ctx = InstallerContext(
             install_dir=str(tmp_path),
-            repo="Cisien/meshcoretomqtt",
+            repo="y3nd/meshcoretomqtt",
             branch="main",
             script_version="1.0.0-test",
         )
@@ -82,5 +82,5 @@ class TestInstallFlow:
         data = json.loads(version_path.read_text())
         assert data["installer_version"] == "1.0.0-test"
         assert data["git_branch"] == "main"
-        assert data["git_repo"] == "Cisien/meshcoretomqtt"
+        assert data["git_repo"] == "y3nd/meshcoretomqtt"
         assert "install_date" in data

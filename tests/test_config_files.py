@@ -41,14 +41,14 @@ from installer.config import (
 class TestWriteUserTomlBase:
     def test_creates_file_with_sections(self, tmp_path: Path) -> None:
         dest = str(tmp_path / "00-user.toml")
-        write_user_toml_base(dest, "SEA", "/dev/ttyACM0", "Cisien/meshcoretomqtt", "main")
+        write_user_toml_base(dest, "SEA", "/dev/ttyACM0", "y3nd/meshcoretomqtt", "main")
 
         with open(dest, "rb") as f:
             data = tomllib.load(f)
 
         assert data["general"]["iata"] == "SEA"
         assert data["serial"]["ports"] == ["/dev/ttyACM0"]
-        assert data["update"]["repo"] == "Cisien/meshcoretomqtt"
+        assert data["update"]["repo"] == "y3nd/meshcoretomqtt"
         assert data["update"]["branch"] == "main"
 
     def test_special_chars_escaped(self, tmp_path: Path) -> None:
@@ -464,7 +464,7 @@ class TestFullComposition:
         """Build a complete config and verify everything via tomllib."""
         dest = str(tmp_path / "00-user.toml")
 
-        write_user_toml_base(dest, "SEA", "/dev/ttyACM0", "Cisien/meshcoretomqtt", "main")
+        write_user_toml_base(dest, "SEA", "/dev/ttyACM0", "y3nd/meshcoretomqtt", "main")
         append_letsmesh_broker_toml(
             dest, "letsmesh-us", "mqtt-us-v1.letsmesh.net",
             "mqtt-us-v1.letsmesh.net", "ABCD" * 16, "test@example.com",
@@ -485,7 +485,7 @@ class TestFullComposition:
         assert data["serial"]["ports"] == ["/dev/ttyACM0"]
 
         # Update
-        assert data["update"]["repo"] == "Cisien/meshcoretomqtt"
+        assert data["update"]["repo"] == "y3nd/meshcoretomqtt"
         assert data["update"]["branch"] == "main"
 
         # Brokers

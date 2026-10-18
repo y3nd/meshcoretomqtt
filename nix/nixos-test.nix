@@ -106,7 +106,7 @@
             assert config["remote_serial"]["allowed_companions"] == []
 
         with subtest("Update section"):
-            assert config["update"]["repo"] == "Cisien/meshcoretomqtt"
+            assert config["update"]["repo"] == "y3nd/meshcoretomqtt"
             assert config["update"]["branch"] == "main"
 
         with subtest("Broker count — US disabled, EU + custom"):

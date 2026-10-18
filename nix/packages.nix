@@ -80,7 +80,7 @@
         description = "A Python-based script to send MeshCore debug and packet capture data to MQTT for analysis.";
         mainProgram = "meshcoretomqtt";
         license = pkgs.lib.licenses.mit;
-        homepage = "https://github.com/Cisien/meshcoretomqtt";
+        homepage = "https://github.com/y3nd/meshcoretomqtt";
       };
     };
   };

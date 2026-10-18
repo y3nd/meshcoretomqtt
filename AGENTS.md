@@ -66,6 +66,8 @@ Three ABC boundaries (`SerialConnection`, `AuthProvider`, `BrokerClient`) allow 
 
 Configuration uses TOML files with a layered override system. Python 3.11+ `tomllib` is used (stdlib, no third-party dependency).
 
+The default installation/update repository is `y3nd/meshcoretomqtt`; the Docker image is `ghcr.io/y3nd/meshcoretomqtt:latest`. Keep repository URLs, bootstrap defaults, Nix configuration, and test expectations aligned with these defaults.
+
 **Default config loading** (no `--config` flags):
 1. `/etc/mctomqtt/config.toml` (base defaults, overwritten on updates)
 2. `/etc/mctomqtt/config.d/10-*.toml` (broker presets selected during install)

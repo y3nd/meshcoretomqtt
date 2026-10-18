@@ -74,7 +74,7 @@ disallowed_commands = ["get prv.key", "set prv.key", "erase", "password"]
 
 [update]
 # Source repository and branch for updates
-repo = "Cisien/meshcoretomqtt"
+repo = "y3nd/meshcoretomqtt"
 branch = "main"
 
 # =============================================================================

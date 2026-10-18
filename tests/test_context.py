@@ -8,7 +8,7 @@ from installer import InstallerContext
 class TestInstallerContext:
     def test_default_values(self) -> None:
         ctx = InstallerContext()
-        assert ctx.repo == "Cisien/meshcoretomqtt"
+        assert ctx.repo == "y3nd/meshcoretomqtt"
         assert ctx.branch == "main"
         assert ctx.install_dir == "/opt/mctomqtt"
         assert ctx.config_dir == "/etc/mctomqtt"
@@ -21,7 +21,7 @@ class TestInstallerContext:
 
     def test_post_init_sets_base_url(self) -> None:
         ctx = InstallerContext()
-        assert ctx.base_url == "https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main"
+        assert ctx.base_url == "https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main"
 
     def test_custom_repo_branch_base_url(self) -> None:
         ctx = InstallerContext(repo="user/repo", branch="develop")

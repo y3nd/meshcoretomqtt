@@ -14,7 +14,7 @@ def main() -> None:
         prog="mctomqtt-installer",
         description="MeshCore to MQTT installer",
     )
-    parser.add_argument("--repo", default=os.environ.get("INSTALL_REPO", "Cisien/meshcoretomqtt"))
+    parser.add_argument("--repo", default=os.environ.get("INSTALL_REPO", "y3nd/meshcoretomqtt"))
     parser.add_argument("--branch", default=os.environ.get("INSTALL_BRANCH", "main"))
 
     sub = parser.add_subparsers(dest="command")

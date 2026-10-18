@@ -5,7 +5,7 @@
 # ============================================================================
 set -e
 
-REPO="${MCTOMQTT_REPO:-Cisien/meshcoretomqtt}"
+REPO="${MCTOMQTT_REPO:-y3nd/meshcoretomqtt}"
 BRANCH="${MCTOMQTT_BRANCH:-main}"
 EXTRA_ARGS=()
 

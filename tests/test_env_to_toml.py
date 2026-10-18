@@ -235,7 +235,7 @@ class TestEnvToTomlRoundtrip:
             "MCTOMQTT_LOG_LEVEL": "DEBUG",
             "MCTOMQTT_SERIAL_PORTS": "/dev/ttyACM0",
             "MCTOMQTT_SERIAL_BAUD_RATE": "9600",
-            "MCTOMQTT_UPDATE_REPO": "Cisien/meshcoretomqtt",
+            "MCTOMQTT_UPDATE_REPO": "y3nd/meshcoretomqtt",
             "MCTOMQTT_UPDATE_BRANCH": "main",
             "MCTOMQTT_REMOTE_SERIAL_ENABLED": "true",
             "MCTOMQTT_REMOTE_SERIAL_ALLOWED_COMPANIONS": "KEY1,KEY2",
@@ -262,7 +262,7 @@ class TestEnvToTomlRoundtrip:
         assert parsed["general"]["log_level"] == "DEBUG"
         assert parsed["serial"]["ports"] == ["/dev/ttyACM0"]
         assert parsed["serial"]["baud_rate"] == 9600
-        assert parsed["update"]["repo"] == "Cisien/meshcoretomqtt"
+        assert parsed["update"]["repo"] == "y3nd/meshcoretomqtt"
         assert parsed["update"]["branch"] == "main"
         assert parsed["remote_serial"]["enabled"] is True
         assert parsed["remote_serial"]["allowed_companions"] == ["KEY1", "KEY2"]

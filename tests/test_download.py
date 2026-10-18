@@ -37,7 +37,7 @@ class TestRepoArchiveSlashBranch:
             # Simulate curl writing the zip (already created above)
             mock_cmd.return_value = None
             result = download_repo_archive(
-                "Cisien/meshcoretomqtt", "cisien/overhaul", str(work_dir),
+                "y3nd/meshcoretomqtt", "cisien/overhaul", str(work_dir),
             )
 
         assert Path(result).name == "meshcoretomqtt-cisien-overhaul"
@@ -53,7 +53,7 @@ class TestRepoArchiveSlashBranch:
              patch("installer.system.print_success"):
             mock_cmd.return_value = None
             result = download_repo_archive(
-                "Cisien/meshcoretomqtt", "main", str(work_dir),
+                "y3nd/meshcoretomqtt", "main", str(work_dir),
             )
 
         assert Path(result).name == "meshcoretomqtt-main"
@@ -64,7 +64,7 @@ class TestDownloadFile:
     def test_download_known_file(self, tmp_path: Path) -> None:
         dest = str(tmp_path / "README.md")
         download_file(
-            "https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/README.md",
+            "https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/README.md",
             dest,
             "README.md",
         )
@@ -76,7 +76,7 @@ class TestDownloadFile:
         dest = str(tmp_path / "nonexistent")
         with pytest.raises(subprocess.CalledProcessError):
             download_file(
-                "https://raw.githubusercontent.com/Cisien/meshcoretomqtt/main/DOES_NOT_EXIST_12345",
+                "https://raw.githubusercontent.com/y3nd/meshcoretomqtt/main/DOES_NOT_EXIST_12345",
                 dest,
                 "nonexistent",
             )
@@ -85,7 +85,7 @@ class TestDownloadFile:
 @pytest.mark.network
 class TestDownloadRepoArchive:
     def test_download_and_extract(self, tmp_path: Path) -> None:
-        repo_dir = download_repo_archive("Cisien/meshcoretomqtt", "main", str(tmp_path))
+        repo_dir = download_repo_archive("y3nd/meshcoretomqtt", "main", str(tmp_path))
         repo_path = Path(repo_dir)
         assert repo_path.is_dir()
         assert (repo_path / "mctomqtt.py").exists()
@@ -94,4 +94,4 @@ class TestDownloadRepoArchive:
 
     def test_invalid_branch_raises(self, tmp_path: Path) -> None:
         with pytest.raises(subprocess.CalledProcessError):
-            download_repo_archive("Cisien/meshcoretomqtt", "nonexistent-branch-12345", str(tmp_path))
+            download_repo_archive("y3nd/meshcoretomqtt", "nonexistent-branch-12345", str(tmp_path))
