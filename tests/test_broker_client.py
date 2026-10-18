@@ -2,11 +2,20 @@
 from __future__ import annotations
 
 import json
+import socket
 
 import pytest
 
 from bridge.mqtt_publish import safe_publish, build_status_message, publish_status
+from bridge.broker_client import PahoBrokerClient
 from tests.fakes import FakeBrokerClient, make_test_state, make_config
+
+
+def test_connection_timeout_is_local_to_paho_client():
+    default_timeout = socket.getdefaulttimeout()
+    client = PahoBrokerClient(client_id='timeout-test')
+    assert client.raw_client.connect_timeout == 30.0
+    assert socket.getdefaulttimeout() == default_timeout
 
 
 class TestFakeBrokerClient:

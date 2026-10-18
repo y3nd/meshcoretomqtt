@@ -70,7 +70,6 @@ class BridgeState:
         # Reconnect params
         self.max_reconnect_delay: float = 120.0
         self.reconnect_backoff: float = 1.5
-        self.max_reconnect_attempts: int = 12
 
         # Token cache
         self.token_cache: dict[int, tuple[str, float]] = {}

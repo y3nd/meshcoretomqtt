@@ -37,6 +37,8 @@ def safe_publish(
         clients_to_publish = state.mqtt_clients
 
     for mqtt_client_info in clients_to_publish:
+        if mqtt_client_info.get('client') is None:
+            continue
         bidx = mqtt_client_info['broker_idx']
         broker = topics.get_broker_config(state, bidx)
         broker_name = broker.get('name', f'broker-{bidx}')

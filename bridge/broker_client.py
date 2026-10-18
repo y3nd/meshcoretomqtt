@@ -63,6 +63,9 @@ class PahoBrokerClient(BrokerClient):
             clean_session=True,
             transport=transport
         )
+        # Remote sites can have slow links. Keep the timeout local to this
+        # client instead of changing the process-wide socket default.
+        self._client.connect_timeout = 30.0
 
         if userdata:
             self._client.user_data_set(userdata)

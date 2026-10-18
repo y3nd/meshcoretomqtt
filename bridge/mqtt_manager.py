@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import logging
 import random
-import socket as _socket
 import threading
 import time
 from typing import Any, TYPE_CHECKING
@@ -26,6 +25,36 @@ class MqttManager:
 
     def __init__(self, state: BridgeState) -> None:
         self.state = state
+        self._retry_stop = threading.Event()
+        self._retry_lock = threading.Lock()
+        self._retry_thread: threading.Thread | None = None
+
+    def start_reconnect_loop(self) -> None:
+        """Run retries in one worker so network waits never block serial reads."""
+        with self._retry_lock:
+            if self.state.should_exit or self._retry_stop.is_set():
+                return
+            if self._retry_thread and self._retry_thread.is_alive():
+                return
+            self._retry_thread = threading.Thread(
+                target=self._reconnect_loop, daemon=True, name="MQTT-Reconnect",
+            )
+            self._retry_thread.start()
+
+    def stop_reconnect_loop(self, timeout: float = 5.0) -> None:
+        """Stop scheduling retries; bound shutdown even during a network wait."""
+        with self._retry_lock:
+            self._retry_stop.set()
+        if self._retry_thread:
+            self._retry_thread.join(timeout=timeout)
+
+    def _reconnect_loop(self) -> None:
+        while not self._retry_stop.is_set() and not self.state.should_exit:
+            try:
+                self.reconnect_disconnected_brokers()
+            except Exception:
+                logger.exception("[MQTT] Unexpected error in reconnect worker")
+            self._retry_stop.wait(0.5)
 
     # ------------------------------------------------------------------
     # Connection lifecycle
@@ -53,23 +82,45 @@ class MqttManager:
                 logger.debug(f"  [{name}] DISABLED")
         logger.debug("=================================")
 
+        # Startup may call this repeatedly until one broker connects. Reuse
+        # registered entries so retries neither lose brokers nor duplicate clients.
+        if state.mqtt_clients:
+            self.reconnect_disconnected_brokers()
+        registered = {info['broker_idx'] for info in state.mqtt_clients}
         for i, broker in enumerate(brokers):
+            if not broker.get('enabled', False) or i in registered:
+                continue
             state.connection_events[i] = threading.Event()
 
             client_info = self._create_and_connect_broker(i)
             if client_info:
                 state.mqtt_clients.append(client_info)
                 client_info['client'].loop_start()
+            else:
+                state.mqtt_clients.append({
+                    'client': None,
+                    'broker_idx': i,
+                    'server': broker.get('server', ''),
+                    'port': broker.get('port', 1883),
+                    'connected': False,
+                    'connecting_since': 0,
+                    'connect_time': 0,
+                    'reconnect_at': time.time() + max(0, 1.0 + random.uniform(-0.5, 0.5)),
+                    'reconnect_delay': min(state.reconnect_backoff, state.max_reconnect_delay),
+                    'failed_attempts': 1,
+                })
 
         if len(state.mqtt_clients) == 0:
             logger.error("[MQTT] Failed to connect to any broker")
             return False
 
-        logger.info(f"[MQTT] Initiated connection to {len(state.mqtt_clients)} broker(s)")
+        logger.info(f"[MQTT] Tracking {len(state.mqtt_clients)} enabled broker(s) for connection and retry")
 
         # Wait for all brokers to complete initial connection attempt
         max_wait = 10
         for mqtt_info in state.mqtt_clients:
+            if mqtt_info.get('client') is None or mqtt_info.get('connected', False):
+                continue
             broker_idx = mqtt_info['broker_idx']
             event = state.connection_events.get(broker_idx)
             if event:
@@ -87,6 +138,8 @@ class MqttManager:
         current_time = time.time()
 
         for i, mqtt_info in enumerate(state.mqtt_clients):
+            if state.should_exit or self._retry_stop.is_set():
+                return
             if mqtt_info.get('connected', False):
                 continue
 
@@ -102,11 +155,6 @@ class MqttManager:
             broker_name = broker.get('name', f'broker-{broker_idx}')
             failed_attempts = mqtt_info.get('failed_attempts', 0)
 
-            if failed_attempts >= state.max_reconnect_attempts:
-                logger.critical(f"[{broker_name}] {state.max_reconnect_attempts} consecutive failures - exiting for service restart")
-                state.should_exit = True
-                return
-
             logger.info(f"[{broker_name}] Reconnecting (attempt #{failed_attempts + 1})")
 
             # Stop old client cleanly
@@ -119,27 +167,46 @@ class MqttManager:
                 except Exception as e:
                     logger.debug(f"[{broker_name}] Error stopping old client: {e}")
 
+            if state.should_exit or self._retry_stop.is_set():
+                return
+
             # Clear token cache to force fresh token
             if broker_idx in state.token_cache:
                 del state.token_cache[broker_idx]
 
             # Create fresh client
-            new_client_info = self._create_and_connect_broker(broker_idx)
+            state.connection_events.setdefault(broker_idx, threading.Event()).clear()
+            try:
+                new_client_info = self._create_and_connect_broker(broker_idx)
+            except Exception:
+                logger.exception(f"[{broker_name}] Failed to create client")
+                new_client_info = None
 
             if new_client_info:
-                state.mqtt_clients[i] = new_client_info
-                new_client_info['client'].loop_start()
+                new_client_info['failed_attempts'] = failed_attempts
+                new_client_info['reconnect_delay'] = mqtt_info['reconnect_delay']
+                # Cleanup may begin while connect() is blocked. Never install
+                # a late client after shutdown has taken its client snapshot.
+                with self._retry_lock:
+                    stopping = state.should_exit or self._retry_stop.is_set()
+                    if not stopping:
+                        state.mqtt_clients[i] = new_client_info
+                        new_client_info['client'].loop_start()
+                if stopping:
+                    self.stop_websocket_ping_thread(broker_idx)
+                    new_client_info['client'].disconnect()
+                    return
                 logger.debug(f"[{broker_name}] Recreated client successfully")
             else:
                 mqtt_info['failed_attempts'] = failed_attempts + 1
                 jitter = random.uniform(-0.5, 0.5)
                 mqtt_info['reconnect_at'] = time.time() + max(0, mqtt_info['reconnect_delay'] + jitter)
-                logger.warning(f"[{broker_name}] Failed to recreate client (attempt #{failed_attempts + 1}/{state.max_reconnect_attempts})")
+                logger.warning(f"[{broker_name}] Failed to recreate client (attempt #{failed_attempts + 1}); will retry")
 
-            mqtt_info['reconnect_delay'] = min(
-                mqtt_info['reconnect_delay'] * state.reconnect_backoff,
-                state.max_reconnect_delay
-            )
+                mqtt_info['reconnect_delay'] = min(
+                    mqtt_info['reconnect_delay'] * state.reconnect_backoff,
+                    state.max_reconnect_delay
+                )
 
     def stop_websocket_ping_thread(self, broker_idx: int) -> None:
         """Cleanly stop the WebSocket ping thread for a broker."""
@@ -436,12 +503,7 @@ class MqttManager:
             return None
 
         try:
-            _prior_timeout = _socket.getdefaulttimeout()
-            _socket.setdefaulttimeout(30)
-            try:
-                broker_client.connect(server, port, keepalive=keepalive)
-            finally:
-                _socket.setdefaulttimeout(_prior_timeout)
+            broker_client.connect(server, port, keepalive=keepalive)
 
             if transport == "websockets":
                 state.ws_ping_threads[broker_idx] = {'active': True}
@@ -469,4 +531,8 @@ class MqttManager:
             }
         except Exception as e:
             logger.error(f"[{broker_name}] Failed to connect: {e}")
+            try:
+                broker_client.disconnect()
+            except Exception:
+                logger.debug(f"[{broker_name}] Failed to close unsuccessful connection", exc_info=True)
             return None

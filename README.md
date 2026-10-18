@@ -9,6 +9,14 @@ you can easily troubleshoot packets through the mesh. You will need to build a
 custom image with packet logging and/or debug for your repeater to view the
 data.
 
+Enabled MQTT brokers remain scheduled for retry when their first connection
+attempt fails, including temporary network routing failures. Retries use an
+independent backoff for each broker while connected brokers continue publishing.
+After startup, retries continue indefinitely with a delay capped at approximately
+120 seconds; an unavailable broker does not restart the bridge. A single
+background worker handles retries so slow network connection attempts do not
+block serial packet collection.
+
 The parser supports the current MeshCore packet log variants from `main`,
 including repeater packet logs without `hash=` and dispatcher/serial logs that
 include `time=` and `hash=`.

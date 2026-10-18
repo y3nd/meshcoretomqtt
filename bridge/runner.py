@@ -181,11 +181,10 @@ def run(state: BridgeState) -> None:
 
     # Main event loop
     try:
+        state.mqtt_manager.start_reconnect_loop()
         while True:
             if state.should_exit:
                 break
-
-            state.mqtt_manager.reconnect_disconnected_brokers()
 
             try:
                 if state.device:
@@ -247,6 +246,9 @@ def _cleanup(state: BridgeState, stats_thread: threading.Thread) -> None:
     logger.info("Cleaning up...")
     state.should_exit = True
 
+    if state.mqtt_manager:
+        state.mqtt_manager.stop_reconnect_loop()
+
     # Stop WebSocket ping threads
     if state.mqtt_manager:
         for mqtt_info in list(state.mqtt_clients):
@@ -270,6 +272,8 @@ def _cleanup(state: BridgeState, stats_thread: threading.Thread) -> None:
 
     # Disconnect MQTT clients
     for mqtt_info in state.mqtt_clients:
+        if mqtt_info.get('client') is None:
+            continue
         try:
             mqtt_info['client'].loop_stop()
             mqtt_info['client'].disconnect()

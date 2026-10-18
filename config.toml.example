@@ -82,6 +82,10 @@ branch = "main"
 # =============================================================================
 # Each [[broker]] block defines an MQTT broker connection.
 # Brokers are identified by "name" for merging in override files.
+# Enabled brokers are retried with independent backoff even if the initial
+# connection fails. After startup, retries continue indefinitely with a delay
+# capped at approximately 120 seconds. Network retries run in the background
+# so an unavailable broker does not stop healthy brokers or serial collection.
 #
 # Auth methods:
 #   "password" - username/password authentication
